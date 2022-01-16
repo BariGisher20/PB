@@ -1,20 +1,15 @@
-from pprint import pprint
 import re
 import csv
-
-
-
-# surname = r"(цев[,\s])|(хин[,\s])|(ина[,\s])|(цов[,\s])"
 
 with open("phonebook_raw.csv", encoding="utf-8") as f:
     rows = csv.reader(f, delimiter=",")
     contacts_list = list(rows)
 
 
-def main():
+def info():
     pattern = r'(\+7|8)[-\s*]?\(?(\d{3})\)?[-\s*]?(\d+)[-\s*]?(\d{2})[-\s*]?(\d{2})\s?((\()?(\w+)(\.)(\s)(\d+)(\))?)?'
     sub = r'+7(\2)\3-\4-\5 \8\9\10\11'
-    new_list = []
+    temple_list = []
     set_l = dict()
     for el in contacts_list:
         full_name = ' '.join(el[:3]).split(' ')
@@ -23,13 +18,28 @@ def main():
         lastname = full_name[2]
         number = re.sub(pattern, sub, el[5])
         email = el[6]
-        set_l[surname, name] = lastname, number, email
-        for k, v in set_l.items():
-            # if v[1] or v[2] == ' ':
+        temple_list.append([surname, name, lastname, number, email])
+    return temple_list
 
 
+def union(list):
+    new_list = []
+    for i, word1 in enumerate(list):
+        for word2 in list[i + 1:]:
+            for el in word1:
+                if el not in word2:
+                    if word1[0] == word2[0]:
+                        word2.append(el)
+                        new_list.append(word2)
+                    else:
+                        new_list.append(word1)
+    return new_list
 
-    # pprint(set_l)
+
+with open("phonebook.csv", "w") as f:
+    datawriter = csv.writer(f, delimiter=',')
+    # Вместо contacts_list подставьте свой список
+    datawriter.writerows(union(info()))
 
 
 
